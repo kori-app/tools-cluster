@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backstage-config
+  namespace: backstage
+data:
+  app-config.yaml: |
+    app:
+      title: Seller Project Developer Portal
+      baseUrl: https://backstage.your-domain.com
+      support:
+        url: https://github.com/kori-app/seller-project/issues
+        items:
+          - title: Issues
+            icon: github
+            links:
+              - url: https://github.com/kori-app/seller-project/issues
+                title: GitHub Issues
+
+    organization:
+      name: Seller Project
+
+    backend:
+      baseUrl: https://backstage.your-domain.com
+      listen:
+        port: 7007
+        host: 0.0.0.0
+      csp:
+        connect-src: ["'self'", 'http:', 'https:']
+      cors:
+        origin: https://backstage.your-domain.com
+        methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+        credentials: true
+      database:
+        client: pg
+        connection:
+          host: postgres
+          port: 5432
+          user: ${POSTGRES_USER}
+          password: ${POSTGRES_PASSWORD}
+          database: ${POSTGRES_DB}
+
+    integrations:
+      github:
+        - host: github.com
+          token: ${GITHUB_TOKEN}
+
+    auth:
+      providers:
+        google:
+          development:
+            clientId: ${GOOGLE_CLIENT_ID}
+            clientSecret: ${GOOGLE_CLIENT_SECRET}
+          production:
+            clientId: ${GOOGLE_CLIENT_ID}
+            clientSecret: ${GOOGLE_CLIENT_SECRET}
+
+    scaffolder:
+      defaultAuthor:
+        name: Seller Project Team
+        email: team@seller-project.com
+      defaultCommitMessage: 'Initial commit from Backstage template'
+
+    catalog:
+      import:
+        entityFilename: catalog-info.yaml
+        pullRequestBranchName: backstage-integration
+      rules:
+        - allow: [Component, System, API, Resource, Location, User, Group]
+      locations:
+        # Seller Project Services
+        - type: url
+          target: https://github.com/kori-app/seller-project/blob/main/backstage/catalog/seller-project.yaml
+        - type: url
+          target: https://github.com/kori-app/seller-project/blob/main/backstage/catalog/seller-dashboard.yaml
+        - type: url
+          target: https://github.com/kori-app/seller-project/blob/main/backstage/catalog/seller-service.yaml
+
+        # Microservices (for future)
+        - type: url
+          target: https://github.com/kori-app/seller-project/blob/main/backstage/catalog/microservices/
+
+    kubernetes:
+      serviceLocatorMethod:
+        type: 'multiTenant'
+      clusterLocatorMethods:
+        - type: 'config'
+          clusters:
+            - url: https://kubernetes.default.svc
+              name: tools-cluster
+              authProvider: 'serviceAccount'
+              skipTLSVerify: false
+              skipMetricsLookup: false
+
+    proxy:
+      '/prometheus/api':
+        target: 'http://prometheus.monitoring.svc.cluster.local:9090/api/v1/'
+        allowedMethods: ['GET']
+      '/grafana/api':
+        target: 'http://grafana.monitoring.svc.cluster.local:3000/'
+        allowedMethods: ['GET']
+      '/argocd/api':
+        target: 'http://argocd-server.argocd.svc.cluster.local/'
+        allowedMethods: ['GET']
+
+    techdocs:
+      builder: 'local'
+      generator:
+        runIn: 'docker'
+      publisher:
+        type: 'local'
+
+    lighthouse:
+      baseUrl: https://backstage.your-domain.com/lighthouse-api
+
+    enabled:
+      kubernetes: true
+      prometheus: true
+      grafana: true
+      argocd: true
+      techdocs: true

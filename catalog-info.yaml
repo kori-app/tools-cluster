@@ -1,0 +1,142 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: tools-cluster
+  description: DataTechSolutions DevOps Tools Cluster - GKE Infrastructure
+  annotations:
+    github.com/project-slug: kori-app/tools-cluster
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - infrastructure
+    - devops
+    - gke
+    - terraform
+  links:
+    - url: https://backstage.tools.datatechsolutions.com.br
+      title: Backstage Developer Portal
+      icon: dashboard
+    - url: https://argocd.tools.datatechsolutions.com.br
+      title: ArgoCD GitOps
+      icon: deployment
+spec:
+  owner: platform-team
+  domain: platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage
+  description: Developer Portal for DataTechSolutions
+  annotations:
+    github.com/project-slug: kori-app/tools-cluster
+    backstage.io/kubernetes-namespace: backstage
+  tags:
+    - developer-portal
+    - documentation
+    - service-catalog
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: tools-cluster
+  providesApis:
+    - backstage-api
+  dependsOn:
+    - component:cloud-sql
+    - component:load-balancer
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: argocd
+  description: GitOps Continuous Deployment for Kubernetes
+  annotations:
+    github.com/project-slug: kori-app/tools-cluster
+    backstage.io/kubernetes-namespace: argocd
+  tags:
+    - gitops
+    - deployment
+    - kubernetes
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: tools-cluster
+  dependsOn:
+    - component:gke-cluster
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: gke-cluster
+  description: Google Kubernetes Engine Cluster (Minimal Configuration)
+  annotations:
+    github.com/project-slug: kori-app/tools-cluster
+  tags:
+    - kubernetes
+    - gcp
+    - infrastructure
+spec:
+  type: kubernetes-cluster
+  owner: platform-team
+  system: tools-cluster
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: cloud-sql
+  description: Google Cloud SQL PostgreSQL Database
+  annotations:
+    github.com/project-slug: kori-app/tools-cluster
+  tags:
+    - database
+    - postgresql
+    - gcp
+spec:
+  type: database
+  owner: platform-team
+  system: tools-cluster
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: load-balancer
+  description: Google Cloud Load Balancer with SSL Certificates
+  annotations:
+    github.com/project-slug: kori-app/tools-cluster
+  tags:
+    - load-balancer
+    - ssl
+    - networking
+spec:
+  type: load-balancer
+  owner: platform-team
+  system: tools-cluster
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: backstage-api
+  description: Backstage Developer Portal API
+  annotations:
+    github.com/project-slug: kori-app/tools-cluster
+spec:
+  type: openapi
+  lifecycle: production
+  owner: platform-team
+  system: tools-cluster
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Backstage API
+      version: 1.0.0
+      description: Backstage Developer Portal REST API
+    servers:
+      - url: https://backstage.tools.datatechsolutions.com.br
+    paths:
+      /api/catalog/entities:
+        get:
+          summary: List catalog entities
+          responses:
+            '200':
+              description: List of entities

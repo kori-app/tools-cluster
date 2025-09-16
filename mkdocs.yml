@@ -1,0 +1,48 @@
+site_name: DataTechSolutions Tools Cluster
+site_description: DevOps tools cluster documentation for minimal GKE setup with Backstage and ArgoCD
+site_url: https://backstage.tools.datatechsolutions.com.br
+
+repo_name: kori-app/tools-cluster
+repo_url: https://github.com/kori-app/tools-cluster
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quick Start: getting-started/quick-start.md
+    - Prerequisites: getting-started/prerequisites.md
+    - Deployment: getting-started/deployment.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Components: architecture/components.md
+    - Cost Analysis: architecture/cost-analysis.md
+  - Operations:
+    - Backstage Setup: operations/backstage.md
+    - ArgoCD Configuration: operations/argocd.md
+    - CI/CD Workflows: operations/cicd.md
+  - Troubleshooting:
+    - Common Issues: troubleshooting/common-issues.md
+    - Monitoring: troubleshooting/monitoring.md
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue
+      accent: light blue
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - techdocs-core
